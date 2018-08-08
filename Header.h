@@ -19,8 +19,8 @@ using namespace std;
 struct keyblock {
 	string title;
 	int frequency = 1;
-	int para[150];//use arr because I'm afraid of using pointer :)) 
-	keyblock() { for (int i = 0; i < 12; ++i) para[i] = 0; };
+	int para[100];//use arr because I'm afraid of using pointer :)) 
+	keyblock() { for (int i = 0; i < 100; ++i) para[i] = 0; };
 };
 
 struct node {
@@ -70,5 +70,5 @@ vector<string> Filter(string in);
 void CreateFile_Summary(string path, string a);
 void ReLoadFile(string path, AVLtree&a);
 void CreateFileHistory(string path, string query)
-
+vector<string> splitkeywords(string query, AVLtree stopwords);
 #endif
