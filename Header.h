@@ -70,5 +70,10 @@ vector<string> Filter(string in);
 void CreateFile_Summary(string path, string a);
 void ReLoadFile(string path, AVLtree&a);
 void CreateFileHistory(string path, string query)
-
+//input processing
+vector<string> splitkeywords(string query, AVLtree stopwords);
+void normal_output(vector<string> input, AVLtree &a);
+void merge(vector<keyblock>&result, vector<keyblock>query);
+void print_vector(vector <keyblock> result, vector<string> query);
+int max_index(int a[100]);
 #endif
