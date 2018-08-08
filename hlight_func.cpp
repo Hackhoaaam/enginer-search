@@ -1,40 +1,5 @@
-#ibclude"Header.h"
 #include "Highlight.h"
-int Nword(string text) {
-	int n = 0; int l = text.length();
-	while (!text.empty()) {
-		int loc = text.find(" ");
-		if (loc < 0 || loc>l)return n + 1;
-		text.erase(0, loc + 1);
-		n++;
-	}
-	return n;
-}
-
-string* query_arr(string text) {
-	//number of individual word inside text
-	int n = Nword(text);
-	//make an array of individual words in the query
-	string* arr = new string[n];
-	int i = 0; int l = text.length();
-
-	while (!text.empty()) {
-		int loc = text.find(" ");
-		//if a word is found in the query loc = location
-		if (loc < l&&loc>0) {
-			arr[i++] = text.substr(0, loc);
-			normalize(arr[i - 1]);//remove puctuation and lower all case
-			text.erase(0, loc + 1);
-		}
-		else {
-			normalize(text);
-			arr[i++] = text;
-			text = "";//erase all of text
-		}
-	}
-	return arr;
-}
-
+#include "Header.h"
 void color_print(string &text) {
 	//print the word but not the associated punctuation
 	string punct;
@@ -55,21 +20,28 @@ void to_lower(string &text) {
 		text[i] = tolower(text[i]);
 }
 void remove_puctuation(string &word) {
+	if (word.size() <= 1)return;
 	int last_char = word.size() - 1;
-	if (ispunct(word[last_char]))word.erase(last_char, 1);
+	if (int(word[last_char])>0 && int(word[last_char])<127)
+		if (ispunct(word[last_char])) {
+			word.erase(last_char, 1);
+		}
 }
 void normalize(string &text) {
+	//cout << "$" << text << "$" << endl;
 	to_lower(text);
+	//cout << "lower" << endl;
 	remove_puctuation(text);
+	//cout << "remove punct" << endl;
 }
 
-bool is_qry(string* queries, int n, string word) {
+bool is_qry(vector<string> queries, int n, string word) {
 	normalize(word);
 	for (int i = 0; i < n; i++)if (word == queries[i]) return true;
 	return false;
 }
 
-void highLightQueries(string *queries, int n, string text) {
+void highLightQueries(vector<string> queries, int n, string text) {
 	unsigned int sz = text.size();
 	while (!text.empty()) {
 		//if a word can not be found inside text
@@ -79,30 +51,35 @@ void highLightQueries(string *queries, int n, string text) {
 			cout << endl;
 			return;
 		}
+		//cout << "get word" << endl;
 		string word = text.substr(0, text.find(" "));
+		//cout << "check query"<<endl;
 		if (is_qry(queries, n, word)) {
 			color_print(word);
 			cout << " ";
 		}
 		else cout << word << " ";
+		//cout << "erase" << endl;
 		text.erase(0, text.find(" ") + 1);
 	}
 }
 
-void hightlight_para(string file_name, int para, string query) {
-	string*queries = query_arr(query);
-	int n = Nword(query);
+void hightlight_para(string file_name, int para, vector<string> query) {
+	int n = query.size();
 	int pos = 1;
 	string text;
-	ifstream read(file_name);
-	if (!read.is_open())cout << "ERROR: CANT OPEN FILE";
+	string file = "C:\\Users\\Light\\Downloads\\CS163-Project-Data\\CS163-Project-Data\\";
+	ifstream read(file + file_name + ".txt");
+	if (!read.is_open())cout << "ERROR: CANT OPEN FILE" << endl;
 	//while not end of file, we still be able to getline into text
 	while (getline(read, text)) {
 		//at correct position
 		if (pos == para) {
-			highLightQueries(queries, n, text);
+			//cout << "HL: "; system("pause");
+			highLightQueries(query, n, text);
 			while (text != "") {
-				if (getline(read, text)) highLightQueries(queries, n, text);
+				//cout << "HL: "; system("pause");
+				if (getline(read, text)) highLightQueries(query, n, text);
 				else return;
 			}
 			return;
