@@ -181,14 +181,36 @@ string itos(int n)
 	return ss.str();
 }
 // Just write today 26/7
-//chưa sửa nữa nè.
 void LoadFile(string path, AVLtree &a)//ctreate filename
 {
 	ifstream fin;
-	for (int i = 2; i <=25 ; ++i)//because we have 25 group =))
+	for (int i = 1; i <=25 ; ++i)//because we have 25 group =))
 	{
 		string filename;
-		for (int j = 1; j <= 100; ++j)
+		int j;
+		int limit;
+		if (i == 3 || i == 5 || i == 11 || i == 12 || i == 15 || i == 17 || i == 25)
+		{
+			j = 0;
+			limit = 99;
+		}
+		else if (i == 7)
+		{
+			j = 1;
+			limit = 112;
+		}
+		else if (i == 19)
+		{
+			j = 1;
+			limit = 101;
+		}
+		//else if (i == 5||i==14||i==15) continue;
+		else
+		{
+			j = 1;
+			limit = 100;
+		}
+		for (; j <= 100; ++j)
 		{
 			if (i < 10 || j < 10)
 			{
@@ -210,15 +232,14 @@ void LoadFile(string path, AVLtree &a)//ctreate filename
 				filename = tmp;
 			}
 			string fullpath = path + filename + ".txt";
+			//CreateFile_Path(path, filename);
 			fin.open(fullpath);
 			if (fin.is_open())//need to put a funtion to read and insert =))
 				fileprocess(fin, a, filename);
 		}
-
 	}
 	a.Sort();
 }
-
 //now we need to write a function dosth =))
 //Just write not yet check
 void fileprocess(ifstream &fin, AVLtree &a, string filename)
