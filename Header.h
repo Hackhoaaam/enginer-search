@@ -2,17 +2,18 @@
 #define FUNCTION_H_
 
 #include <iostream>
-#include <conio.h>
-#include <string>
-#include <Windows.h>
-#include <time.h>
-#include <cstring>
-#include <fstream>
-#include <vector>
-#include <sstream>
 #include"Highlight.h"
 #include"Operator.h"
 #include"UI.h"
+#include <conio.h>
+#include <string>
+#include <Windows.h>
+#include <cstring>
+#include <fstream>
+#include <vector>
+#include<time.h>
+#include <sstream>
+
 
 using namespace std;
 
@@ -54,10 +55,13 @@ public:
 	int checkBalance(node* N);
 	void printPreorder();
 	void printPostorder();
+	bool search(string x, node*&tmp);
 	void printInorder();
-	bool search(string x);
 	void LoadStopWord();
-	node * searchPriceAndHash(string key);
+	void searchPriceAndHash(string key);
+	void search_OR(string&text);
+	void Check_Operator(string in);
+	void exactOps(string query, AVLtree &stopword);
 };
 //some plugin function =))
 int Max(int a, int b);
@@ -70,11 +74,14 @@ void keyblockSort(vector<keyblock> &a);
 vector<string> Filter(string in);
 void CreateFile_Summary(string path, string a);
 void ReLoadFile(string path, AVLtree&a);
-void CreateFileHistory(string path, string query)
+void CreateFileHistory(string path, string query);
 //input processing
 vector<string> splitkeywords(string query, AVLtree stopwords);
 void normal_output(vector<string> input, AVLtree &a);
 void merge(vector<keyblock>&result, vector<keyblock>query);
 void print_vector(vector <keyblock> result, vector<string> query);
 int max_index(int a[100]);
+
+bool isExist(string keyword, keyblock &tmp);
+
 #endif
