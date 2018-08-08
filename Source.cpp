@@ -181,6 +181,7 @@ string itos(int n)
 	return ss.str();
 }
 // Just write today 26/7
+//chưa sửa nữa nè.
 void LoadFile(string path, AVLtree &a)//ctreate filename
 {
 	ifstream fin;
