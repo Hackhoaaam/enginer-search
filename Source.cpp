@@ -51,7 +51,7 @@ node* AVLtree::insert(node* N, string keyword, keyblock data, int position) {
 	if (N == NULL) {
 		N = new node;
 		N->key = keyword;
-		if(!data.title.empty())
+		if (!data.title.empty())
 			N->data.push_back(data);
 		N->left = NULL;
 		N->right = NULL;
@@ -147,7 +147,7 @@ node* AVLtree::search(node *cur, string x)
 	return search(cur->right, x);
 }
 
-bool AVLtree::search(string x,node*&tmp)
+bool AVLtree::search(string x, node*&tmp)
 {
 	tmp = search(root, x);
 	if (tmp == NULL) return false;
@@ -184,7 +184,7 @@ string itos(int n)
 void LoadFile(string path, AVLtree &a)//ctreate filename
 {
 	ifstream fin;
-	for (int i = 1; i <=25 ; ++i)//because we have 25 group =))
+	for (int i = 1; i <= 2; ++i)//because we have 25 group =))
 	{
 		string filename;
 		int j;
@@ -247,50 +247,50 @@ void fileprocess(ifstream &fin, AVLtree &a, string filename)
 	char sample[20];
 	int para = 0;
 	//if (fin.is_open()) {
-		while (!fin.eof()) {// this after this step we still need to update sth =))
-			int pos = fin.tellg();
-			fin.get(sample, 20, ' ');
-			fin.ignore(1000, ' ');
-			if (strlen(sample) == 0)
+	while (!fin.eof()) {// this after this step we still need to update sth =))
+		int pos = fin.tellg();
+		fin.get(sample, 20, ' ');
+		fin.ignore(1000, ' ');
+		if (strlen(sample) == 0)
+			break;
+		string keyword;
+		for (int i = 0; i < strlen(sample); ++i)
+		{
+			if (sample[0] == '\n'&&sample[1] == '\n')
+			{
+				++para;
+				fin.seekg(pos + 2);
+			}
+			if (sample[i] == '\n')//try to find location of the next word
+			{
+
+				fin.seekg(pos + i + 1);
 				break;
-			string keyword;
-			for (int i = 0; i < strlen(sample); ++i)
-			{
-				if (sample[0] == '\n'&&sample[1] == '\n')
-				{
-					++para;
-					fin.seekg(pos+2);
-				}
-				if (sample[i] == '\n')//try to find location of the next word
-				{
-
-					fin.seekg(pos + i + 1);
-					break;
-				}
-				if (sample[i] <= 255 && sample[i] >= 0)
-				{
-					if (sample[i] == 39 && sample[i + 1] == 's')//remove 's
-						i += 2;
-					else if (!ispunct(sample[i])&&!isspace(sample[i])||sample[i]=='#'||sample[i]=='$')
-						keyword += sample[i];
-				}
 			}
-			if (!keyword.empty())
+			if (sample[i] <= 255 && sample[i] >= 0)
 			{
-				keyblock data;
-				data.title = filename;
-				//right here we need to initialize a keyblock in order to put it to vector
-				//if it doesn't exist, if it exist we may need a variable of postion to access quickly
-				//to an arr
-				data.para[para] = 1;
-
-				lowercase(keyword);//convert to lowercase
-				a.insert(keyword, data, para);
+				if (sample[i] == 39 && sample[i + 1] == 's')//remove 's
+					i += 2;
+				else if (!ispunct(sample[i]) && !isspace(sample[i]) || sample[i] == '#' || sample[i] == '$')
+					keyword += sample[i];
 			}
-
 		}
-		cout << filename << endl;
-		fin.close();
+		if (!keyword.empty())
+		{
+			keyblock data;
+			data.title = filename;
+			//right here we need to initialize a keyblock in order to put it to vector
+			//if it doesn't exist, if it exist we may need a variable of postion to access quickly
+			//to an arr
+			data.para[para] = 1;
+
+			lowercase(keyword);//convert to lowercase
+			a.insert(keyword, data, para);
+		}
+
+	}
+	cout << filename << endl;
+	fin.close();
 	//}
 }
 
@@ -314,23 +314,7 @@ void keyblockSort(vector<keyblock> &a)
 
 	}
 }
-/*void paragraphSort(vector<paragraph> &a)
-{
-int j;
-paragraph k;
-int n = a.size();
-for (int i = 1; i < n; ++i)
-{
-k.frequency = a[i].frequency;
-j = i - 1;
-while (j >= 0 && a[j].frequency < k.frequency)
-{
-a[j + 1] = a[j];
---j;
-}
-a[j + 1] = k;
-}
-}*/
+
 //traverse preorder to sort =))
 void AVLtree::Sort() {//by traverse preoder
 	traversePreorder(root);
@@ -385,6 +369,7 @@ vector<string> Filter(string in) {
 	int l = 0, r, i, temp_sw = 0;
 	vector<string> split;
 	string temp;
+	node *dum = NULL;
 	int length = in.length();
 	tree_sw.LoadStopWord();
 
@@ -394,7 +379,7 @@ vector<string> Filter(string in) {
 			temp = in.substr(l, (r - l));
 			l = i + 1;
 			lowercase(temp);
-			if (!tree_sw.search(temp) || temp == "and"&&temp_sw == 0 || temp == "or"&&temp_sw == 0) {
+			if (!tree_sw.search(temp,dum) || temp == "and"&&temp_sw == 0 || temp == "or"&&temp_sw == 0) {
 				if (temp == "and" || temp == "or")
 					temp_sw++;
 				split.push_back(temp);
@@ -403,20 +388,13 @@ vector<string> Filter(string in) {
 	}
 	temp = in.substr(l, (i - l));
 	lowercase(temp);
-	if (!tree_sw.search(temp) || temp == "and"&&temp_sw == 0 || temp == "or"&&temp_sw == 0) {
+	if (!tree_sw.search(temp,dum) || temp == "and"&&temp_sw == 0 || temp == "or"&&temp_sw == 0) {
 		if (temp == "and" || temp == "or")
 			temp_sw++;
 		split.push_back(temp);
 	}
 	return split;
 }
-
-
-node * AVLtree::searchPriceAndHash(string key) {
-	node* tmp = search(root, key);
-	return out;
-}
-
 
 void ReLoadFile(string path, AVLtree&a) {
 	ifstream fin, fin_file;
@@ -427,7 +405,7 @@ void ReLoadFile(string path, AVLtree&a) {
 	if (fin.is_open()) {
 		while (!fin.eof()) {
 			string filename;
-			getline(fin,filename, '\n');
+			getline(fin, filename, '\n');
 			string fullpath = tmp + filename + ".txt";
 			fin_file.open(fullpath);
 			if (fin_file.is_open())
@@ -450,7 +428,7 @@ void CreateFile_Summary(string path, string a) {
 }
 
 //save the history search
-void CreateFileHistory(string path,string query) {
+void CreateFileHistory(string path, string query) {
 	ofstream fout;
 	fout.open(path, ios::app);
 	if (fout.is_open()) {
@@ -464,7 +442,7 @@ vector<string> splitkeywords(string query, AVLtree stopwords) {
 	int l = 0, r, i;
 	vector<string> split;
 	string temp;
-	node*dumb=NULL;
+	node*dumb = NULL;
 	int length = query.length();
 	for (i = 0; i<length; i++) {
 		if (query[i] == ' ') {
@@ -472,24 +450,24 @@ vector<string> splitkeywords(string query, AVLtree stopwords) {
 			temp = query.substr(l, (r - l));
 			l = i + 1;
 			lowercase(temp);
-			if (!stopwords.search(temp,dumb)) {
-			split.push_back(temp);
+			if (!stopwords.search(temp, dumb)) {
+				split.push_back(temp);
 			}
 		}
 	}
 	temp = query.substr(l, (i - l));
 	lowercase(temp);
-	if (!stopwords.search(temp,dumb)) {
+	if (!stopwords.search(temp, dumb)) {
 		split.push_back(temp);
 	}
 	delete dumb;
 	return split;
 }
-void normal_output(vector<string> input,AVLtree &a) {
+void normal_output(vector<string> input, AVLtree &a) {
 	vector <keyblock> result;
 	for (int i = 0; i < input.size(); i++) {
-		node*get=NULL;
-		a.search(input[i],get);
+		node*get = NULL;
+		a.search(input[i], get);
 		if (get != NULL)
 			merge(result, get->data);
 	}
@@ -521,12 +499,12 @@ void merge(vector<keyblock>&result, vector<keyblock>query) {
 void print_vector(vector <keyblock> result, vector<string> query) {
 	for (int i = 0; i < result.size(); i++) {
 		if (i >= 5)return;
-		int pr = max_index(result[i].para)+1;
+		int pr = max_index(result[i].para) + 1;
 		cout << "$";
 		color_print(result[i].title);
 		cout << "$ ";
 		cout << "f = " << result[i].frequency;
-		cout << "p = " << pr << "$"<<endl;
+		cout << "p = " << pr << "$" << endl;
 		hightlight_para(result[i].title, pr, query);
 		cout << endl << endl;
 	}
@@ -536,4 +514,91 @@ int max_index(int a[100]) {
 	for (int i = 1; i < 100; i++)
 		if (a[i] > a[idx]) idx = i;
 	return idx;
+}
+void AVLtree::searchPriceAndHash(string key) {
+	node* tmp = search(root, key);
+	vector<string> query;
+	query.push_back(key);
+	if (tmp->key == key) {
+		for (int i = 0; i < tmp->data.size(); i++) {
+			if (i >= 5) break;
+			print_vector(tmp->data, query);
+		}
+	}
+}
+
+void AVLtree::search_OR(string&text) {
+	int Or = text.find("OR");
+	string query1;
+	string query2;
+	node *dum;
+	vector <string> query;
+	for (int i = 0; i < Or -1; i++)query1 += text[i];
+	for (int i = Or +3; i < text.size(); i++)query2 += text[i];
+	node*get1; node*get2;
+	if (search(query1, dum) == true) get1 = search(root, query1);
+	else return;
+	if (search(query2, dum) == true) get2 = search(root, query2);
+	else return;
+	query.push_back(query1);
+	query.push_back(query2);
+	vector<keyblock> result;
+	for (int i = 0; i < get1->data.size(); i++) {
+		if (i >= 5)break;
+		result.push_back(get1->data[i]);
+	}
+	for (int i = 0; i < get1->data.size(); i++) {
+		if (i >= 5)break;
+		result.push_back(get2->data[i]);
+	}
+	keyblockSort(result);
+	//string query = query1 + " " + query2;
+	print_vector(result, query);
+}
+
+
+void AVLtree:: exactOps(string query, AVLtree &stopword)
+{
+	//filter the word after the first "
+	string keyword = query.substr(query.find('"') + 1, query.find('"', query.find('"') + 1) - query.find('"') - 1);
+	vector<string>queries = splitkeywords(keyword, stopword);
+	node*get = NULL;
+	search(queries[0], get);
+	vector<keyblock> result;
+	for (int i = 0; i < get->data.size(); ++i)
+	{
+		keyblock tmp;
+		tmp.title = get->data[i].title;
+		if (isExist(keyword, tmp))
+			result.push_back(tmp);
+		if (result.size() == 5)
+			break;
+	}
+	keyblockSort(result);
+	print_vector(result, queries);
+
+}
+
+
+
+
+
+
+
+//check va goi operator
+
+void AVLtree::Check_Operator(string in) {
+	if (is_OR(in)) {
+		search_OR(in);
+		return;
+	}
+	else if (is_hashtag(in) || is_currency(in)) {
+		searchPriceAndHash(in);
+		return;
+	}
+	else if (isExact(in)) {
+		AVLtree stopword;
+		stopword.LoadStopWord();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+			exactOps(in, stopword);
+	}
 }
