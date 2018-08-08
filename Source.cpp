@@ -147,9 +147,9 @@ node* AVLtree::search(node *cur, string x)
 	return search(cur->right, x);
 }
 
-bool AVLtree::search(string x)
+bool AVLtree::search(string x,node*&tmp)
 {
-	node * tmp = search(root, x);
+	tmp = search(root, x);
 	if (tmp == NULL) return false;
 	if (tmp->key == x) return true;
 	return false;
@@ -181,6 +181,7 @@ string itos(int n)
 	return ss.str();
 }
 // Just write today 26/7
+//chưa sửa nữa nè.
 void LoadFile(string path, AVLtree &a)//ctreate filename
 {
 	ifstream fin;
@@ -236,7 +237,8 @@ void fileprocess(ifstream &fin, AVLtree &a, string filename)
 			{
 				if (sample[0] == '\n'&&sample[1] == '\n')
 				{
-					para = (para + 1);
+					++para;
+					fin.seekg(pos+2);
 				}
 				if (sample[i] == '\n')//try to find location of the next word
 				{
@@ -306,7 +308,6 @@ a[j + 1] = a[j];
 --j;
 }
 a[j + 1] = k;
-
 }
 }*/
 //traverse preorder to sort =))
@@ -317,10 +318,6 @@ void AVLtree::Sort() {//by traverse preoder
 void AVLtree::traversePreorder(node* N) {
 	if (N != NULL) {
 		keyblockSort(N->data);
-		for (int i = 0; i < N->data.size(); ++i)
-		{
-			//paragraphSort(N->data[i].para);
-		}
 		traversePreorder(N->left);
 		traversePreorder(N->right);
 	}
@@ -440,4 +437,82 @@ void CreateFileHistory(string path,string query) {
 		fout.close();
 	}
 }
-
+//below here is the place for 
+//input processing
+vector<string> splitkeywords(string query, AVLtree stopwords) {
+	int l = 0, r, i;
+	vector<string> split;
+	string temp;
+	node*dumb=NULL;
+	int length = query.length();
+	for (i = 0; i<length; i++) {
+		if (query[i] == ' ') {
+			r = i;
+			temp = query.substr(l, (r - l));
+			l = i + 1;
+			lowercase(temp);
+			if (!stopwords.search(temp,dumb)) {
+			split.push_back(temp);
+			}
+		}
+	}
+	temp = query.substr(l, (i - l));
+	lowercase(temp);
+	if (!stopwords.search(temp,dumb)) {
+		split.push_back(temp);
+	}
+	delete dumb;
+	return split;
+}
+void normal_output(vector<string> input,AVLtree &a) {
+	vector <keyblock> result;
+	for (int i = 0; i < input.size(); i++) {
+		node*get=NULL;
+		a.search(input[i],get);
+		if (get != NULL)
+			merge(result, get->data);
+	}
+	keyblockSort(result);
+	print_vector(result, input);
+}
+void merge(vector<keyblock>&result, vector<keyblock>query) {
+	int n_res = result.size();
+	int n_que = query.size();
+	bool is_update = false;
+	int update = 0;
+	for (int i = 0; i < n_que; i++) {
+		if (update >= 5)return;
+		for (int j = 0; j < n_res; j++)
+			if (query[i].title == result[j].title) {
+				result[j].frequency += query[i].frequency;
+				for (int k = 0; k < 100; k++)result[j].para[k] += query[i].para[k];
+				is_update = true;
+				update++;
+				j += 999;//stop the loop
+			}
+		if (!is_update) {
+			result.push_back(query[i]);
+			n_res++;
+		}
+		is_update = false;
+	}
+}
+void print_vector(vector <keyblock> result, vector<string> query) {
+	for (int i = 0; i < result.size(); i++) {
+		if (i >= 5)return;
+		int pr = max_index(result[i].para)+1;
+		cout << "$";
+		color_print(result[i].title);
+		cout << "$ ";
+		cout << "f = " << result[i].frequency;
+		cout << "p = " << pr << "$"<<endl;
+		hightlight_para(result[i].title, pr, query);
+		cout << endl << endl;
+	}
+}
+int max_index(int a[100]) {
+	int idx = 0;
+	for (int i = 1; i < 100; i++)
+		if (a[i] > a[idx]) idx = i;
+	return idx;
+}
