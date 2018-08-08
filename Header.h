@@ -5,6 +5,7 @@
 #include <conio.h>
 #include <string>
 #include <Windows.h>
+#include <time.h>
 #include <cstring>
 #include <fstream>
 #include <vector>
