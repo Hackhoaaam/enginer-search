@@ -54,7 +54,7 @@ public:
 	void printPreorder();
 	void printPostorder();
 	void printInorder();
-	bool search(string x);
+	bool search(string x,node*&tmp);
 	void LoadStopWord();
 	node * searchPriceAndHash(string key);
 };
